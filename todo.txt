@@ -1,0 +1,11 @@
+Ampersand at end of selector moves it up 1 and selects current parent
+
+body {
+  [foo=bar] & {
+  }
+}
+
+to:
+
+body[foo=bar] {
+}
