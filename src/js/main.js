@@ -10,6 +10,7 @@ var cssify = {
     Object.keys(rules).forEach(function(selector) {
       var node = { selector: selector, indent: indent, props: {} } 
       var parentSelectors = selector.split(/\s*,\s*/);
+      var prop, subselect;
       result.push(node);
 
       for (prop in rules[selector]) {
@@ -47,7 +48,7 @@ var cssify = {
   compile: function(rules) {
     var flat = this.flatten(rules);
     var output = [];
-    var spaces;
+    var spaces, rule, prop;
 
     for (rule of flat) {
       spaces = this.indent(rule.indent + 1);
