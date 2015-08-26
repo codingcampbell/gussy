@@ -13,6 +13,17 @@ var cssify = {
       var prop, subselect;
       result.push(node);
 
+      var valueProps = Object.keys(rules[selector]).filter(function(rule) {
+        return typeof rules[selector][rule] !== 'object';
+      });
+
+      /* Don't include selectors which have no rules
+      * (this happens when only nested selectors exist under a selector)
+      */
+      if (!valueProps.length) {
+        result.pop();
+      }
+
       for (prop in rules[selector]) {
         if (typeof rules[selector][prop] === 'object') {
           var nestedRule = {};
@@ -35,7 +46,7 @@ var cssify = {
           }).join(', ');
 
           nestedRule[newSelector] = rules[selector][prop];
-          flatten(nestedRule, result, indent + 1);
+          flatten(nestedRule, result, valueProps.length ? indent + 1 : indent);
         } else {
           node.props[prop] = String(rules[selector][prop]);
         }
@@ -51,6 +62,13 @@ var cssify = {
     var spaces, rule, prop;
 
     for (rule of flat) {
+      /* This is just to match libsass output:
+      * Root-level rules have an empty line after the closing brace
+      */
+      if (output.length && rule.indent === 0) {
+        output.push('');
+      }
+
       spaces = this.indent(rule.indent + 1);
 
       output.push(this.indent(rule.indent) + rule.selector + ' {');
@@ -58,7 +76,7 @@ var cssify = {
         output.push(spaces + prop + ': ' + rule.props[prop] + ';');
       }
 
-      output.push(this.indent(rule.indent) + '}');
+      output.push(output.pop() + ' }');
     }
 
     return output.join('\n');
