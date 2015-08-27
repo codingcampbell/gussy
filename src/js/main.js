@@ -41,7 +41,11 @@ var cssify = {
 
           newSelector = nestedSelectors.map(function (nestedSelector) {
             return parentSelectors.map(function (parentSelector) {
-              return parentSelector + nestedSelector.replace(/&/g, parentSelector);
+              if (/&/.test(nestedSelector)) {
+                return nestedSelector.replace(/^\s+/g, '').replace(/&/g, parentSelector);
+              }
+
+              return parentSelector + nestedSelector;
             }).join(', ');
           }).join(', ');
 
