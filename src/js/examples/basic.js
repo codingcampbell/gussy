@@ -6,6 +6,7 @@ module.exports = {
   a: {
     color: '#00f',
     '&:hover': {
+      fontWeight: 'bold',
       'text-decoration': 'underline'
     }
   }

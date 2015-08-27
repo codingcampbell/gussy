@@ -3,6 +3,12 @@ module.exports = {
     return new Array(level + 1).join('  ');
   },
 
+  camelToHyphen: function(text) {
+    return text.replace(/([^\b])([A-Z]{1})/g, function(match, extra, letter) {
+      return extra + '-' + letter.toLowerCase();
+    });
+  },
+
   flatten: function flatten(rules, result, indent) {
     result = result || [];
     indent = indent || 0;
@@ -77,7 +83,7 @@ module.exports = {
 
       output.push(this.indent(rule.indent) + rule.selector + ' {');
       for (prop in rule.props) {
-        output.push(spaces + prop + ': ' + rule.props[prop] + ';');
+        output.push(spaces + this.camelToHyphen(prop) + ': ' + rule.props[prop] + ';');
       }
 
       output.push(output.pop() + ' }');
