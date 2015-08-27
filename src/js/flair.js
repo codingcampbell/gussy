@@ -14,7 +14,7 @@ module.exports = {
     indent = indent || 0;
 
     Object.keys(rules).forEach(function(selector) {
-      var node = { selector: selector, indent: indent, props: {} } 
+      var node = { selector: selector, indent: indent, props: {} }
       var parentSelectors = selector.split(/\s*,\s*/);
       var prop, subselect;
       result.push(node);
@@ -66,7 +66,13 @@ module.exports = {
     return result;
   },
 
-  compile: function(rules) {
+  compile: function(rules, callback) {
+    if (typeof rules === 'function') {
+      return rules(function(asyncRules) {
+        this.compile(asyncRules, callback);
+      }.bind(this));
+    }
+
     var flat = this.flatten(rules);
     var output = [];
     var spaces, rule, prop;
@@ -89,6 +95,8 @@ module.exports = {
       output.push(output.pop() + ' }');
     }
 
-    return output.join('\n');
+    var result = output.join('\n');
+    callback(result);
+    return result;
   }
 };

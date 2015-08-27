@@ -1,4 +1,6 @@
 var flair = require('./flair');
 var style = require('./examples/basic');
 
-console.log(flair.compile(style));
+flair.compile(style, function(result) {
+  console.log(result);
+});
