@@ -35,7 +35,12 @@ tasks.javascript = function(opts, callback) {
     b = watchify(b);
   }
 
-  b.transform(babelify);
+  b.transform(babelify.configure({
+    blacklist: [
+      'es6.forOf',
+      'spec.functionName'
+    ]
+  }));
 
   if (opts.minify) {
     b.transform({
