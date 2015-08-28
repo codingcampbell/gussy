@@ -1,3 +1,5 @@
+var util = require('./util');
+
 var indent = function(level) {
   return new Array(level + 1).join('  ');
 };
@@ -13,6 +15,9 @@ var flatten = function(rules, result, indent) {
   indent = indent || 0;
 
   Object.keys(rules).forEach(function(selector) {
+    // Support util/underscore/lodash wraps
+    rules[selector] = rules[selector]._wrapped || rules[selector].__wrapped__ || rules[selector];
+
     var node = { selector: selector, indent: indent, props: {} }
     var parentSelectors = selector.split(/\s*,\s*/);
     var prop, subselect;
@@ -70,7 +75,7 @@ var compile = function(rules, callback) {
   if (typeof rules === 'function') {
     return rules(function(asyncRules) {
       compile(asyncRules, callback);
-    });
+    }, util);
   }
 
   var flat = flatten(rules);
