@@ -103,29 +103,58 @@ var resolve = function(flatRules, callback) {
 };
 
 var output = {};
-output.nested = function(flatRules) {
+output.base = function(flatRules, noIndent, indentIncrease, space, ruleSpace, closeBracketSeparator, newline, compressed) {
   var output = [];
   var spaces, rule, prop;
 
   for (rule of flatRules) {
-    /* This is just to match libsass output:
-    * Root-level rules have an empty line after the closing brace
-    */
+    rule.indent = noIndent ? 0 : rule.indent;
+
+    // Root-level rules have an empty line after the closing brace
     if (output.length && rule.indent === 0) {
       output.push('');
     }
 
-    spaces = indent(rule.indent + 1);
+    spaces = indent(rule.indent + indentIncrease);
 
-    output.push(indent(rule.indent) + rule.selector + ' {');
+    output.push(indent(rule.indent) + rule.selector + space + '{' + ruleSpace);
     for (prop in rule.props) {
-      output.push(spaces + camelToHyphen(prop) + ': ' + rule.props[prop].join('') + ';');
+      output.push(spaces + camelToHyphen(prop) + ':' + space + rule.props[prop].join('') + ';' + ruleSpace);
     }
 
-    output.push(output.pop() + ' }');
+    if (compressed) {
+      /* Remove the last character from the last rule.
+      * In compressed-mode, this would be a semicolon.
+      * In compact-mode, this would be an extra space.
+      */
+      output.push(output.pop().slice(0, -1));
+    }
+
+    output.push(output.pop() + closeBracketSeparator + '}');
   }
 
-  return output.join('\n');
+  return output.join(newline);
+};
+
+output.nested = function(flatRules) {
+  return output.base(flatRules, false, 1, ' ', '', ' ', '\n');
+}
+
+output.expanded = function(flatRules) {
+  return output.base(flatRules, true, 1, ' ', '', '\n', '\n');
+};
+
+output.compact = function(flatRules) {
+  var result = [], rule;
+  for (rule of flatRules) {
+    result.push(output.base([rule], true, 0, ' ', ' ', ' ', '', true));
+  }
+
+  return result.join('\n\n');
+};
+
+output.compressed = function(flatRules) {
+  return output.base(flatRules, true, 0, '', '', '', '', true);
 };
 
 var compile = function(rules, callback) {
