@@ -1,7 +1,7 @@
 {
-  "name": "cssify",
+  "name": "glam-up",
   "version": "0.0.1",
-  "description": "cssify",
+  "description": "Write your stylesheets in JavaScript",
   "scripts": {
     "dev": "node tasks dev",
     "compile": "node tasks compile",
