@@ -71,18 +71,12 @@ var flatten = function(rules, result, indent) {
   return result;
 };
 
-var compile = function(rules, callback) {
-  if (typeof rules === 'function') {
-    return rules(function(asyncRules) {
-      compile(asyncRules, callback);
-    }, util);
-  }
-
-  var flat = flatten(rules);
+var output = {};
+output.nested = function(flatRules) {
   var output = [];
   var spaces, rule, prop;
 
-  for (rule of flat) {
+  for (rule of flatRules) {
     /* This is just to match libsass output:
     * Root-level rules have an empty line after the closing brace
     */
@@ -100,7 +94,18 @@ var compile = function(rules, callback) {
     output.push(output.pop() + ' }');
   }
 
-  var result = output.join('\n');
+  return output.join('\n');
+};
+
+var compile = function(rules, callback) {
+  if (typeof rules === 'function') {
+    return rules(function(asyncRules) {
+      compile(asyncRules, callback);
+    }, util);
+  }
+
+  var flat = flatten(rules);
+  var result = output.nested(flat);
   callback(result);
   return result;
 };
