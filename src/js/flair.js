@@ -10,6 +10,10 @@ var camelToHyphen = function(text) {
   });
 };
 
+var isValue = function(rule) {
+  return typeof rule !== 'object' || rule.constructor === Promise;
+};
+
 var flatten = function(rules, result, indent) {
   result = result || [];
   indent = indent || 0;
@@ -24,7 +28,7 @@ var flatten = function(rules, result, indent) {
     result.push(node);
 
     var valueProps = Object.keys(rules[selector]).filter(function(rule) {
-      return typeof rules[selector][rule] !== 'object';
+      return isValue(rules[selector][rule]);
     });
 
     /* Don't include selectors which have no rules
@@ -35,7 +39,7 @@ var flatten = function(rules, result, indent) {
     }
 
     for (prop in rules[selector]) {
-      if (typeof rules[selector][prop] === 'object') {
+      if (!isValue(rules[selector][prop])) {
         var nestedRule = {};
         var selectors = prop.split(/\s*,\s*/);
         var nestedSelectors = [];
@@ -63,12 +67,31 @@ var flatten = function(rules, result, indent) {
         nestedRule[newSelector] = rules[selector][prop];
         flatten(nestedRule, result, valueProps.length ? indent + 1 : indent);
       } else {
-        node.props[prop] = String(rules[selector][prop]);
+        node.props[prop] = rules[selector][prop];
       }
     };
   });
 
   return result;
+};
+
+// Resolve all values that are Promises
+var resolve = function(flatRules, callback) {
+  var rule, prop, promises = [];
+
+  for (rule of flatRules) {
+    for (prop in rule.props) {
+      if (rule.props[prop].constructor === Promise) {
+        promises.push(rule.props[prop].then(function(props, prop, value) {
+          props[prop] = value;
+        }.bind(this, rule.props, prop)));
+      }
+    }
+  }
+
+  Promise.all(promises).then(function() {
+    callback(flatRules);
+  });
 };
 
 var output = {};
@@ -104,12 +127,10 @@ var compile = function(rules, callback) {
     }, util);
   }
 
-  var flat = flatten(rules);
-  var result = output.nested(flat);
-  callback(result);
-  return result;
+  resolve(flatten(rules), function(result) {
+    callback(output.nested(result));
+  });
 };
-
 
 module.exports = {
   compile: compile
