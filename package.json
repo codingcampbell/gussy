@@ -1,6 +1,6 @@
 {
   "name": "glam-up",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Write your stylesheets in JavaScript",
   "main": "index.js",
   "devDependencies": {

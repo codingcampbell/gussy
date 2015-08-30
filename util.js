@@ -35,6 +35,19 @@ Util.prototype.loop = function(arr, fn) {
   return this;
 };
 
-module.exports = function(rule) {
+var util = function(rule) {
   return new Util(rule);
 };
+
+util.prefix = function(value) {
+  return function(key) {
+    var result = {};
+    result['-webkit-' + key] = value;
+    result['-moz-' + key] = value;
+    result['-ms-' + key] = value;
+    result[key] = value;
+    return result;
+  };
+};
+
+module.exports = util;

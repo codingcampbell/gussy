@@ -11,7 +11,7 @@ var camelToHyphen = function(text) {
 };
 
 var isValue = function(rule) {
-  return typeof rule !== 'object' || rule.constructor === Promise || rule.constructor === Array;
+  return typeof rule !== 'object' || typeof rule === 'function' || rule.constructor === Promise || rule.constructor === Array;
 };
 
 var arrayWrap = function(value) {
@@ -48,6 +48,7 @@ var flatten = function(rules, result, indent) {
         var selectors = prop.split(/\s*,\s*/);
         var nestedSelectors = [];
         var newSelector;
+        var funcValue, funcProp;
 
         for (subselect of selectors) {
           if (/^&[^, ]/.test(subselect)) { // Sub-selector wants attached to parent
@@ -71,7 +72,14 @@ var flatten = function(rules, result, indent) {
         nestedRule[newSelector] = rules[selector][prop];
         flatten(nestedRule, result, valueProps.length ? indent + 1 : indent);
       } else {
-        node.props[prop] = arrayWrap(rules[selector][prop]);
+        if (typeof rules[selector][prop] === 'function') {
+          funcValue = rules[selector][prop](prop);
+          for (funcProp in funcValue) {
+            node.props[funcProp] = arrayWrap(funcValue[funcProp]);
+          }
+        } else {
+          node.props[prop] = arrayWrap(rules[selector][prop]);
+        }
       }
     };
   });
