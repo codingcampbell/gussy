@@ -157,7 +157,7 @@ output.compressed = function(flatRules) {
   return output.base(flatRules, true, 0, '', '', '', '', true);
 };
 
-var compile = function(rules, callback) {
+var compile = function(options, rules, callback) {
   if (typeof rules === 'function') {
     return rules(function(asyncRules) {
       compile(asyncRules, callback);
@@ -165,10 +165,18 @@ var compile = function(rules, callback) {
   }
 
   resolve(flatten(rules), function(result) {
-    callback(output.nested(result));
+    callback(output[options.outputStyle](result));
   });
 };
 
-module.exports = {
-  compile: compile
+module.exports = function(options) {
+  options = options || {};
+
+  if (!options.outputStyle || options.outputStyle === 'base' || !output[options.outputStyle]) {
+    options.outputStyle = 'nested';
+  }
+
+  return {
+    compile: compile.bind(this, options)
+  };
 };

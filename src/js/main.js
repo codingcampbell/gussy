@@ -1,6 +1,6 @@
 var flair = require('./flair');
 var style = require('./examples/promises');
 
-flair.compile(style, function(result) {
+flair({outputStyle: 'nested'}).compile(style, function(result) {
   console.log(result);
 });
