@@ -160,7 +160,7 @@ output.compressed = function(flatRules) {
 var compile = function(options, rules, callback) {
   if (typeof rules === 'function') {
     return rules(function(asyncRules) {
-      compile(asyncRules, callback);
+      compile(options, asyncRules, callback);
     }, util);
   }
 
