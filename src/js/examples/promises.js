@@ -7,8 +7,13 @@ var gitUrl = src => new Promise(resolve => exec('git rev-parse HEAD', (err, resu
 
 module.exports = {
   '.content': {
-    '.img-container': {
-      background: gitUrl('bg.jpg')
+    '.img-container-1': {
+      'background-image': gitUrl('bg-1.jpg'),
+      'background-repeat': 'no-repeat'
+    },
+
+    '.img-container-2': {
+      background: [gitUrl('bg-2.jpg'), ' no-repeat']
     }
   }
 };

@@ -11,7 +11,11 @@ var camelToHyphen = function(text) {
 };
 
 var isValue = function(rule) {
-  return typeof rule !== 'object' || rule.constructor === Promise;
+  return typeof rule !== 'object' || rule.constructor === Promise || rule.constructor === Array;
+};
+
+var arrayWrap = function(value) {
+  return value && value.constructor === Array && value || [value];
 };
 
 var flatten = function(rules, result, indent) {
@@ -67,7 +71,7 @@ var flatten = function(rules, result, indent) {
         nestedRule[newSelector] = rules[selector][prop];
         flatten(nestedRule, result, valueProps.length ? indent + 1 : indent);
       } else {
-        node.props[prop] = rules[selector][prop];
+        node.props[prop] = arrayWrap(rules[selector][prop]);
       }
     };
   });
@@ -77,14 +81,18 @@ var flatten = function(rules, result, indent) {
 
 // Resolve all values that are Promises
 var resolve = function(flatRules, callback) {
-  var rule, prop, promises = [];
+  var rule, prop, index, promises = [];
 
   for (rule of flatRules) {
     for (prop in rule.props) {
-      if (rule.props[prop].constructor === Promise) {
-        promises.push(rule.props[prop].then(function(props, prop, value) {
-          props[prop] = value;
-        }.bind(this, rule.props, prop)));
+      for (index in rule.props[prop]) {
+        if (rule.props[prop][index].constructor !== Promise) {
+          continue;
+        }
+
+        promises.push(rule.props[prop][index].then(function(prop, index, value) {
+          prop[index] = value;
+        }.bind(this, rule.props[prop], index)));
       }
     }
   }
@@ -111,7 +119,7 @@ output.nested = function(flatRules) {
 
     output.push(indent(rule.indent) + rule.selector + ' {');
     for (prop in rule.props) {
-      output.push(spaces + camelToHyphen(prop) + ': ' + rule.props[prop] + ';');
+      output.push(spaces + camelToHyphen(prop) + ': ' + rule.props[prop].join('') + ';');
     }
 
     output.push(output.pop() + ' }');
