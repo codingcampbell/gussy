@@ -1,6 +1,6 @@
 {
-  "name": "glam-up",
-  "version": "0.0.2",
+  "name": "gussy",
+  "version": "0.0.1",
   "description": "Write your stylesheets in JavaScript",
   "main": "index.js",
   "devDependencies": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/codingcampbell/glam-up.git"
+    "url": "https://github.com/codingcampbell/gussy.git"
   },
   "author": "Matt Campbell <matt@mattcampbell.net>",
   "license": "MIT"
