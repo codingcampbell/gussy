@@ -11,7 +11,7 @@ var camelToHyphen = function(text) {
 };
 
 var isValue = function(rule) {
-  return typeof rule !== 'object' || typeof rule === 'function' || rule.constructor === Promise || rule.constructor === Array;
+  return typeof rule !== 'object' || typeof rule === 'function' || typeof rule.then === 'function' || rule.constructor === Array;
 };
 
 var arrayWrap = function(value) {
@@ -94,11 +94,11 @@ var resolve = function(flatRules, callback) {
   for (rule of flatRules) {
     for (prop in rule.props) {
       for (index in rule.props[prop]) {
-        if (rule.props[prop][index].constructor !== Promise) {
+        if (typeof rule.props[prop][index].then !== 'function') {
           continue;
         }
 
-        promises.push(rule.props[prop][index].then(function(prop, index, value) {
+        promises.push(Promise.resolve(rule.props[prop][index]).then(function(prop, index, value) {
           prop[index] = value;
         }.bind(this, rule.props[prop], index)));
       }
