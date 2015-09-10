@@ -127,7 +127,7 @@ output.base = function(flatRules, noIndent, indentIncrease, space, ruleSpace, cl
 
     output.push(indent(rule.indent) + rule.selector + space + '{' + ruleSpace);
     for (prop in rule.props) {
-      output.push(spaces + camelToHyphen(prop) + ':' + space + rule.props[prop].join('') + ';' + ruleSpace);
+      output.push(spaces + camelToHyphen(prop.trim()) + ':' + space + rule.props[prop].join('').trim() + ';' + ruleSpace);
     }
 
     if (compressed) {
