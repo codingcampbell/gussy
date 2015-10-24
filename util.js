@@ -7,16 +7,22 @@ var _range = function(n) {
 var Util = function(rule) {
   this.rule = rule;
   this._wrapped = rule;
+  this.selectorPrefix = '';
 }
 
 Util.prototype.extend = function(ext) {
+  /* Add padding to selectors to avoid namespace collision
+  * (due to JavaScript's unique-key restriction for objects)
+  */
+  this.selectorPrefix += ' ';
+
   if (typeof ext !== 'object' || ext === null) {
     return this;
   }
 
   var prop;
   for (prop in ext) {
-    this.rule[prop] = ext[prop];
+    this.rule[this.selectorPrefix + prop] = ext[prop];
   }
 
   return this;
