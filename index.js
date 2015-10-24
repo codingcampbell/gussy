@@ -129,7 +129,7 @@ output.base = function(flatRules, noIndent, indentIncrease, space, ruleSpace, cl
 
     spaces = indent(rule.indent + indentIncrease);
 
-    output.push(indent(rule.indent) + rule.selector + space + '{' + ruleSpace);
+    output.push(indent(rule.indent) + rule.selector.trim() + space + '{' + ruleSpace);
     for (prop in rule.props) {
       output.push(spaces + camelToHyphen(prop.trim()) + ':' + space + rule.props[prop].join('').trim() + ';' + ruleSpace);
     }
