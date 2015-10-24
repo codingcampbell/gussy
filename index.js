@@ -18,13 +18,17 @@ var arrayWrap = function(value) {
   return value && value.constructor === Array && value || [value];
 };
 
+var unwrapRules = function(rules) {
+  // Support util/underscore/lodash wraps
+  return rules._wrapped || rules.__wrapped__ || rules;
+};
+
 var flatten = function(rules, result, indent) {
   result = result || [];
   indent = indent || 0;
 
   Object.keys(rules).forEach(function(selector) {
-    // Support util/underscore/lodash wraps
-    rules[selector] = rules[selector]._wrapped || rules[selector].__wrapped__ || rules[selector];
+    rules[selector] = unwrapRules(rules[selector]);
 
     var node = { selector: selector, indent: indent, props: {} }
     var parentSelectors = selector.split(/\s*,\s*/);
@@ -172,7 +176,7 @@ var compile = function(options, rules, callback) {
     }, util);
   }
 
-  resolve(flatten(rules), function(result) {
+  resolve(flatten(unwrapRules(rules)), function(result) {
     callback(output[options.outputStyle](result));
   });
 };
