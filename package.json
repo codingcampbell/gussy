@@ -1,6 +1,6 @@
 {
   "name": "gussy",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Write your stylesheets in JavaScript",
   "main": "index.js",
   "repository": {

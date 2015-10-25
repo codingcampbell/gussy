@@ -30,7 +30,14 @@ var flatten = function(rules, result, indent) {
   Object.keys(rules).forEach(function(selector) {
     rules[selector] = unwrapRules(rules[selector]);
 
-    var node = { selector: selector, indent: indent, props: {} }
+    var isMediaQuery = /^@media/.test(selector.trim());
+
+    if (isMediaQuery) {
+      result.push({ selector: selector, indent: indent, braceOpen: true, braceClose: false, props: {} });
+      indent += 1;
+    }
+
+    var node = { selector: selector, braceOpen: true, braceClose: true, indent: indent, props: {} }
     var parentSelectors = selector.split(/\s*,\s*/);
     var prop, subselect;
     result.push(node);
@@ -63,13 +70,16 @@ var flatten = function(rules, result, indent) {
         }
 
         newSelector = nestedSelectors.map(function (nestedSelector) {
+          var nested = nestedSelector.trim();
           return parentSelectors.map(function (parentSelector) {
+            var parent = parentSelector.trim();
+
             // Special case: non-leading ampersand (leading ampersands are removed above)
-            if (/&/.test(nestedSelector)) {
-              return nestedSelector.replace(/^\s+/g, '').replace(/&/g, parentSelector);
+            if (/&/.test(nested)) {
+              return nested.replace(/&/g, parent);
             }
 
-            return parentSelector + nestedSelector;
+            return (isMediaQuery? '' : parent) + nested;
           }).join(', ');
         }).join(', ');
 
@@ -85,7 +95,12 @@ var flatten = function(rules, result, indent) {
           node.props[prop] = arrayWrap(rules[selector][prop]);
         }
       }
-    };
+    }
+
+    if (isMediaQuery) {
+      indent -= 1;
+      result.push({ selector: '', indent: indent, braceOpen: false, braceClose: true, props: {} });
+    }
   });
 
   return result;
@@ -129,7 +144,14 @@ output.base = function(flatRules, noIndent, indentIncrease, space, ruleSpace, cl
 
     spaces = indent(rule.indent + indentIncrease);
 
-    output.push(indent(rule.indent) + rule.selector.trim() + space + '{' + ruleSpace);
+    if (rule.braceOpen) {
+      output.push(indent(rule.indent) + rule.selector.trim() + space + '{' + ruleSpace);
+    }
+
+    if (!rule.braceClose && compressed) {
+      output.push(' ');
+    }
+
     for (prop in rule.props) {
       output.push(spaces + camelToHyphen(prop.trim()) + ':' + space + rule.props[prop].join('').trim() + ';' + ruleSpace);
     }
@@ -139,10 +161,10 @@ output.base = function(flatRules, noIndent, indentIncrease, space, ruleSpace, cl
       * In compressed-mode, this would be a semicolon.
       * In compact-mode, this would be an extra space.
       */
-      output.push(output.pop().slice(0, -1));
+      output.push(output.length ? output.pop().slice(0, -1) : '');
     }
 
-    output.push(output.pop() + closeBracketSeparator + '}');
+    output.push(output.pop() + (rule.braceOpen ? closeBracketSeparator : '') + (rule.braceClose ? '}' : ''));
   }
 
   return output.join(newline);
