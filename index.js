@@ -69,8 +69,7 @@ var flatten = function(rules, result, indent) {
           }
         }
 
-        newSelector = nestedSelectors.map(function (nestedSelector) {
-          var nested = nestedSelector.trim();
+        newSelector = nestedSelectors.map(function (nested) {
           return parentSelectors.map(function (parentSelector) {
             var parent = parentSelector.trim();
 
