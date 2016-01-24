@@ -1,0 +1,8 @@
+.content .img-container-1 {
+  background-image: url(bg-1.jpg?v=d5ea0b2);
+  background-repeat: no-repeat;
+}
+
+.content .img-container-2 {
+  background: url(bg-2.jpg?v=d5ea0b2) no-repeat;
+}

@@ -1,7 +1,7 @@
 var exec = require('child_process').exec;
 
 // Append ?v=<git-sha> to URL. Useful for things like cache-busting
-var gitUrl = src => new Promise(resolve => exec('git rev-parse HEAD', (err, result) =>
+var gitUrl = src => new Promise(resolve => exec('git rev-parse v0.0.6', (err, result) =>
   resolve(`url(${src}?v=${result.toString().slice(0, 7)})`)
 ));
 

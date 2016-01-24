@@ -3,10 +3,17 @@
   "version": "0.0.6",
   "description": "Write your stylesheets in JavaScript",
   "main": "index.js",
+  "scripts": {
+    "test": "mocha test/test.js",
+    "gen-test": "mocha test/gen-output.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/codingcampbell/gussy.git"
   },
   "author": "Matt Campbell <matt@mattcampbell.net>",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "mocha": "^2.3.4"
+  }
 }
