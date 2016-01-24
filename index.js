@@ -65,7 +65,7 @@ var flatten = function(rules, result, indent) {
           if (/^&[^, ]/.test(subselect)) { // Sub-selector wants attached to parent
             nestedSelectors.push(subselect.slice(1));
           } else {
-            nestedSelectors.push(' ' + subselect);
+            nestedSelectors.push(' ' + subselect.trim());
           }
         }
 
