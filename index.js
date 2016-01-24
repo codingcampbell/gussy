@@ -191,13 +191,9 @@ output.compressed = function(flatRules) {
 };
 
 var compile = function(options, rules, callback) {
-  if (typeof rules === 'function') {
-    return rules(function(asyncRules) {
-      compile(options, asyncRules, callback);
-    }, util);
-  }
+  var flat = flatten(unwrapRules(typeof rules === 'function' ? rules(util) : rules));
 
-  resolve(flatten(unwrapRules(rules)), function(result) {
+  resolve(flat, function(result) {
     callback(output[options.outputStyle](result));
   });
 };

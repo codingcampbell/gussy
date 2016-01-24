@@ -1,4 +1,4 @@
-module.exports = (async, util) => async({
+module.exports = util => ({
   body: {
     color: '#f00'
   },
